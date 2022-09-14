@@ -1,0 +1,26 @@
+<?php
+/**
+ * Элемент "{{ name }}" для генерации одноимённого веб-компонента.
+ */
+?>
+
+<?php $this->start('wc-{{ name }}') ?>
+<template id="{{ name }}">
+
+	<?php // Содержимое веб-компонента. ?>
+
+</template>
+<?php $this->end() ?>
+
+<?php if ( $attr[0]['js'] ): ?>
+	<?php echo
+		$this->Html->script('components/{{ name }}/{{ name }}', [
+			'block' => true,
+			'type' => 'module',
+		]);
+	?>
+<?php endif; ?>
+
+<brunov-{{ name }}<?= $this->Webcomp->addattr( $attr[0] ) ?>>
+	<?= $attr[0]['content'] ?? '' ?>
+</brunov-{{ name }}>

@@ -1,0 +1,78 @@
+
+/**
+ * Веб-компонент "{{ name }}".
+ */
+
+import Template from './template.js';
+
+/**
+ * Класс {{ name|title|replace({'-':''}) }}
+ */
+export default class {{ name|title|replace({'-':''}) }} extends HTMLElement {
+
+    /**
+     * Конструктор.
+     */
+    constructor() {
+
+		super();
+		
+		// Теневая модель.
+		this.root = this.attachShadow( {mode: 'open'} );
+
+		// Подключаем CSS.
+		this.root.innerHTML = Template.render();
+		
+		// Копируем с шаблона содержимое.
+		const template = document.getElementById( '{{ name }}' );
+		const clone = template.content.cloneNode( true );
+		this.root.appendChild( clone );
+		
+		// Подключаем кеширование.
+		this.dom = Template.mapDom( this.root );
+		
+		// Задаём значения по умолчанию.
+		
+		
+		// Производим необходимые настройки атрибутов.
+		this.settingAttr();
+
+		// СОБЫТИЯ:
+		this.dom.valera.addEventListener('click', (e) => console.log(e.currentTarget));// Для примера.
+    }
+
+    /**
+     * Определяем, за какими атрибутами необходимо наблюдать.
+     */
+    static get observedAttributes() {
+		//return ['Имя атрибута'];
+	}
+
+	/**
+	 * Следим за изменениями этих атрибутов и отвечаем соответственно.
+	 */
+	attributeChangedCallback( name, oldVal, newVal )
+	{
+		switch( name ) {
+			case 'Имя атрибута':
+				// Выполняемый код.
+				break;
+			case 'Имя атрибута':
+				// Выполняемый код.
+				break;
+		}
+	}
+
+	/**
+	 * Браузер вызывает этот метод при добавлении элемента в документ.
+	 * (может вызываться много раз, если элемент многократно добавляется/удаляется).
+	 */
+    connectedCallback() {
+		
+    }
+}
+
+// Регистрация веб-компонента.
+if ( !customElements.get( 'brunov-{{ name }}' ) ) {
+    customElements.define( 'brunov-{{ name }}', {{ name|title|replace({'-':''}) }} );
+}
