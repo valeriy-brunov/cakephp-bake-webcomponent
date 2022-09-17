@@ -17,25 +17,25 @@ export default class {{ name|title|replace({'-':''}) }} extends HTMLElement {
 
 		super();
 		
+		// Задаём значения по умолчанию.
+		// this.fantesi = true;
+
 		// Теневая модель.
 		this.root = this.attachShadow( {mode: 'open'} );
 
 		// Подключаем CSS.
 		this.root.innerHTML = Template.render();
-		
+
 		// Копируем с шаблона содержимое.
-		const template = document.getElementById( '{{ name }}' );
+		const template = this.querySelector( '.{{ name }}' );
 		const clone = template.content.cloneNode( true );
 		this.root.appendChild( clone );
-		
+
 		// Подключаем кеширование.
 		this.dom = Template.mapDom( this.root );
-		
-		// Задаём значения по умолчанию.
-		
-		
+
 		// Производим необходимые настройки атрибутов.
-		this.settingAttr();
+		// this.settingAttr();
 
 		// СОБЫТИЯ:
 		this.dom.valera.addEventListener('click', (e) => console.log(e.currentTarget));// Для примера.

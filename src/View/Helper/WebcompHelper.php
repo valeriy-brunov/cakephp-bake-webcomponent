@@ -35,16 +35,20 @@ class WebcompHelper extends Helper
 		// Если массив не пуст.
 		if ( !empty($arr) ) {
 			if ( !array_key_exists( 'js', $arr[0] ) ) {
-				$arr[0]['js'] = true;
+				// Устанавливаем значение по-умолчанию.
+				$arr[0]['js'] = false;
 			}
 		}
 		else {
-			$arr[0]['js'] = true;
+			// Устанавливаем значение по-умолчанию.
+			$arr[0]['js'] = false;
 		}
+
+		$name = strtolower( preg_replace('/([A-Z]{1})/', '-$1', $name ) );
 
 		return $this->getView()->element( '/components/' . $name, ['attr' => $arr] );
 	}
-	
+
 	/**
 	 * Метод addattr
 	 * 
@@ -74,5 +78,25 @@ class WebcompHelper extends Helper
 			}
 		}
 		else return '';
+	}
+
+	/**
+	 * Возвращает переданную строку, содержащую Html код, без тегов <script...></script>.
+	 * 
+	 * @param {string} $fetch
+	 * 		Строка, содержащая Html код.
+	 * @param {boolean} $js
+	 * 		Выключает фильтрацию Html кода на наличие тегов <script...></script>.
+	 */
+	public function filterScript( $fetch, $js ): string
+	{
+		if ( $js ) return $fetch;
+
+		$arr = explode( '<script', $fetch );
+		if ( count($arr) == 2 ) {
+			$arr_= explode( '</script>', $arr[1] );
+			return $arr[0] . $arr_[1];
+		}
+		else return $arr[0];
 	}
 }

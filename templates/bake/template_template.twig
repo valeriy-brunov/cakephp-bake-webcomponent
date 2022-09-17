@@ -9,7 +9,7 @@ export default {
 	},
 
 	/**
-	 * Кэширование элементов компонента.
+	 * Кэширование элементов компонента для теневой модели.
 	 */
 	mapDom( scope ) {
 		return {
@@ -24,6 +24,18 @@ export default {
 		<style>
 			:host { color: red; }// Для {{ name }}.
 		</style>`;
+	},
+	
+	/**
+	 * AJAX-запрос.
+	 */
+	ajax( url ) {
+		const request = new XMLHttpRequest();
+		request.open( 'GET', url, true );
+		request.addEventListener( 'load', (e) => {
+			this.querySelect( 'brunov-{{ name }}.{{ name }}' ).innerHTML = e.target.response;
+		});
+		request.send();
 	},
 }
 
