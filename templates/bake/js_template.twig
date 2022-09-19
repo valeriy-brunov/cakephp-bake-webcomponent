@@ -1,4 +1,3 @@
-
 /**
  * Веб-компонент "{{ name }}".
  */
@@ -16,7 +15,7 @@ export default class {{ name|title|replace({'-':''}) }} extends HTMLElement {
     constructor() {
 
 		super();
-		
+
 		// Задаём значения по умолчанию.
 		// this.fantesi = true;
 
@@ -31,6 +30,12 @@ export default class {{ name|title|replace({'-':''}) }} extends HTMLElement {
 		const clone = template.content.cloneNode( true );
 		this.root.appendChild( clone );
 
+		// иначе все содержимое переносим в теневую модель, оставляя тег <template> пустым:
+		const template = this.querySelector( '.{{ name }}' );
+		const fragment = document.createDocumentFragment();
+		fragment.appendChild( template.content );
+		this.root.appendChild( fragment );
+
 		// Подключаем кеширование.
 		this.dom = Template.mapDom( this.root );
 
@@ -38,7 +43,7 @@ export default class {{ name|title|replace({'-':''}) }} extends HTMLElement {
 		// this.settingAttr();
 
 		// СОБЫТИЯ:
-		this.dom.valera.addEventListener('click', (e) => console.log(e.currentTarget));// Для примера.
+		// this.dom.valera.addEventListener('click', (e) => console.log(e.currentTarget));// Для примера.
     }
 
     /**
@@ -72,7 +77,9 @@ export default class {{ name|title|replace({'-':''}) }} extends HTMLElement {
     }
 }
 
-// Регистрация веб-компонента.
+/**
+ * Регистрация веб-компонента.
+ */
 if ( !customElements.get( 'brunov-{{ name }}' ) ) {
     customElements.define( 'brunov-{{ name }}', {{ name|title|replace({'-':''}) }} );
 }
