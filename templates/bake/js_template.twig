@@ -16,16 +16,13 @@ export default class {{ name|title|replace({'-':''}) }} extends HTMLElement {
 
 		super();
 
-		// Задаём значения по умолчанию.
-		// this.fantesi = true;
-
-		// Теневая модель.
+		// Теневая модель:
 		this.root = this.attachShadow( {mode: 'open'} );
 
-		// Подключаем CSS.
+		// Подключаем CSS:
 		this.root.innerHTML = Template.render();
 
-		// Копируем с шаблона содержимое.
+		// Копируем с шаблона содержимое:
 		const template = this.querySelector( '.{{ name }}' );
 		const clone = template.content.cloneNode( true );
 		this.root.appendChild( clone );
@@ -36,15 +33,33 @@ export default class {{ name|title|replace({'-':''}) }} extends HTMLElement {
 		fragment.appendChild( template.content );
 		this.root.appendChild( fragment );
 
-		// Подключаем кеширование.
+		// Подключаем кеширование:
 		this.dom = Template.mapDom( this.root );
-
-		// Производим необходимые настройки атрибутов.
-		// this.settingAttr();
-
-		// СОБЫТИЯ:
-		// this.dom.valera.addEventListener('click', (e) => console.log(e.currentTarget));// Для примера.
+		
+		// Настраиваем атрибуты:
+		if ( !this.hex ) {
+			// Если атрибут не установлен, используем значение по умолчанию:
+			this.hex = this.DEFAULT_HEX;
+		}
     }
+    
+    /**
+     * Сеттеры и геттеры.
+     */
+    set hex( val ) {
+		this.setAttribute( 'hex', val );
+	}
+	
+	get hex() {
+		return this.getAttribute( 'hex' );
+	}
+	
+	/**
+	 * Значения по умолчанию.
+	 */
+	static get DEFAULT_HEX() {
+		return '#45AD23';
+	}
 
     /**
      * Определяем, за какими атрибутами необходимо наблюдать.
@@ -73,7 +88,8 @@ export default class {{ name|title|replace({'-':''}) }} extends HTMLElement {
 	 * (может вызываться много раз, если элемент многократно добавляется/удаляется).
 	 */
     connectedCallback() {
-		
+		// СОБЫТИЯ:
+		// this.dom.valera.addEventListener('click', (e) => console.log(e.currentTarget));// Для примера.
     }
 }
 

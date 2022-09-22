@@ -59,3 +59,4 @@ myCompValera
 ```php
 <?= $this->Webcomp->myLife( ['content' => 'Содержимое'] ) ?>
 ```
+
