@@ -42,18 +42,18 @@ export default class {{ name|title|replace({'-':''}) }} extends HTMLElement {
 			this.hex = this.DEFAULT_HEX;
 		}
     }
-    
+
     /**
      * Сеттеры и геттеры.
      */
     set hex( val ) {
 		this.setAttribute( 'hex', val );
 	}
-	
+
 	get hex() {
 		return this.getAttribute( 'hex' );
 	}
-	
+
 	/**
 	 * Значения по умолчанию.
 	 */
