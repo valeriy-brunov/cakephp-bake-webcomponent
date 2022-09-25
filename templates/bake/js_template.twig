@@ -22,16 +22,11 @@ export default class {{ name|title|replace({'-':''}) }} extends HTMLElement {
 		// Подключаем CSS:
 		this.root.innerHTML = Template.render();
 
+		// Выбираем одно из действий:
 		// Копируем с шаблона содержимое:
-		const template = this.querySelector( '.{{ name }}' );
-		const clone = template.content.cloneNode( true );
-		this.root.appendChild( clone );
-
+		this.cloneContent();
 		// иначе все содержимое переносим в теневую модель, оставляя тег <template> пустым:
-		const template = this.querySelector( '.{{ name }}' );
-		const fragment = document.createDocumentFragment();
-		fragment.appendChild( template.content );
-		this.root.appendChild( fragment );
+		this.moveContent();
 
 		// Подключаем кеширование:
 		this.dom = Template.mapDom( this.root );
@@ -42,18 +37,37 @@ export default class {{ name|title|replace({'-':''}) }} extends HTMLElement {
 			this.hex = this.DEFAULT_HEX;
 		}
     }
-
+    
+    /**
+     * Клонируем с шаблона содержимое.
+     */
+    cloneContent() {
+		const template = this.querySelector( '.{{ name }}' );
+		const clone = template.content.cloneNode( true );
+		this.root.appendChild( clone );
+	}
+	
+	/**
+	 * Все содержимое переносим в теневую модель, оставляя тег <template> пустым.
+	 */
+	moveContent() {
+		const template = this.querySelector( '.{{ name }}' );
+		const fragment = document.createDocumentFragment();
+		fragment.appendChild( template.content );
+		this.root.appendChild( fragment );
+	}
+    
     /**
      * Сеттеры и геттеры.
      */
     set hex( val ) {
 		this.setAttribute( 'hex', val );
 	}
-
+	
 	get hex() {
 		return this.getAttribute( 'hex' );
 	}
-
+	
 	/**
 	 * Значения по умолчанию.
 	 */
