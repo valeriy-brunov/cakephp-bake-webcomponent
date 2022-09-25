@@ -1,36 +1,94 @@
 /**
- * AJAX-запросы.
+ * AJAX-запрос.
  */
 export default {
 
 	/**
-	 * Заменяет внутри селектора всё содержимое.
+	 * Параметры запроса по умолчанию.
 	 */
-	inner( url, selector ) {
-		const request = new XMLHttpRequest();
-		request.open( 'GET', url, true );
-		request.addEventListener( 'load', (e) => {
-			selector.innerHTML = e.target.response;
-		});
-		request.send();
-		request.onload = function() {
-			if (request.status != 200) {
-				alert('Ошибка ${request.status}: ${request.statusText}');
+	get DEFAULT_PARAMS() {
+		return {
+			url: '',
+			method: 'GET',
+			async: true,
+			success: function(html) {},
+			beforeSend: function() {},
+			error: function(status, statusText) {
+				if (status != 200) {
+					console.log('Ошибка запроса' + status + ':' + statusText);
+				}
+			},
+			errorConnect: function() {
+				console.log('Ошибка соединения!');
+			},
+			progress: function(e) {
+				/*
+				if ( e.lengthComputable ) {
+					alert('Получено ${e.loaded} из ${e.total} байт');
+				}
+				else {
+					alert('Получено ${e.loaded} байт');
+				}
+				*/
+			},
+			complete: function( request ) {
+				// Готово, получили ${request.response.length} байт.
+				// Если ответ в виде JSON: request.response.имя_литерала
+			},
+		}
+	},
+
+	/**
+	 * XMLHttpRequest-запрос.
+	 * 
+	 * @param {object} param
+	 * 		Параметры запроса:
+	 * 			url: адрес запроса;
+	 * 			method: метод запроса GET или POST;
+	 * 			async: асинхронно или синхронно;
+	 * 			data: данные передоваемые в запросе (строка или объект).
+	 * 		Параметры, прикреплённые к событиям:
+	 * 			success: ответ от сервера успешно получен вместе с кодом html;
+	 * 			beforeSend: функция срабатывает перед AJAX-запросом;
+	 * 			complete: срабатывает по окончанию запроса;
+	 * 			progress: отслеживает загрузку;
+	 * 			errorConnect: срабатывает, если произошла ошибка соединения;
+	 * 			error: сработывает, если произошла ошибка запроса.
+	 */
+	connect( params ) {
+		if ( "url" in params ) {
+			let p = this.DEFAULT_PARAMS;
+			Object.assign( p, params );
+
+			p.beforeSend();
+
+			const request = new XMLHttpRequest();
+			request.open( p.method, p.url, p.async );
+			request.addEventListener( 'load', (e) => {
+				p.success( e.target.response );
+			});
+			if ( "data" in p ) {
+				request.send( p.data );
 			}
 			else {
-				alert('Готово, получили ${request.response.length} байт');
+				request.send();
 			}
-		};
-		request.onprogress = function( event ) {
-			if ( event.lengthComputable ) {
-				alert('Получено ${event.loaded} из ${event.total} байт');
-			}
-			else {
-				alert('Получено ${event.loaded} байт');
-			}
-		};
-		request.onerror = function() {
-			alert('Ошибка соединения!');
-		};
+
+			request.onload = () => {
+				if (request.status != 200) {
+					p.error( request.status, request.statusText );
+				}
+				else {
+					p.complete( request );
+				}
+			};
+
+			request.onprogress = ( event ) => p.progress( event );
+
+			request.onerror = () => p.errorConnect();
+		}
+		else {
+			console.log('Не указан адрес запроса url!');
+		}
 	},
 }

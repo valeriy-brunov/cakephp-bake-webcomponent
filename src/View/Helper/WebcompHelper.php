@@ -53,13 +53,17 @@ class WebcompHelper extends Helper
 	 * Метод addattr
 	 * 
 	 * Создает из массива строку Html с атрибутуми и их значениями.
+     *
+     * @param {array} $arr
+     *    Массив, содержащий атрибуты и их значения:
+     *       ['атрибут' => значение]
 	 */
     public function addattr( array $arr ): string
     {
 		if ( array_key_exists( 'js', $arr ) ) {
 			unset($arr['js']);
 		}
-		
+
 		if ( array_key_exists( 'content', $arr ) ) {
 			unset($arr['content']);
 		}
