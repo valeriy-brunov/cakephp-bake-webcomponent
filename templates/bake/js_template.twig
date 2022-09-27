@@ -30,12 +30,6 @@ export default class {{ name|title|replace({'-':''}) }} extends HTMLElement {
 
 		// Подключаем кеширование:
 		this.dom = Template.mapDom( this.root );
-		
-		// Настраиваем атрибуты:
-		if ( !this.hex ) {
-			// Если атрибут не установлен, используем значение по умолчанию:
-			this.hex = this.DEFAULT_HEX;
-		}
     }
     
     /**
@@ -65,7 +59,10 @@ export default class {{ name|title|replace({'-':''}) }} extends HTMLElement {
 	}
 	
 	get hex() {
-		return this.getAttribute( 'hex' );
+		if ( this.getAttribute( 'hex' ) ) {
+			return this.getAttribute( 'hex' );
+		}
+		else return {{ name|title|replace({'-':''}) }}.DEFAULT_HEX;
 	}
 	
 	/**
