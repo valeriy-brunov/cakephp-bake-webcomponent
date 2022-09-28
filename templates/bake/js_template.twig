@@ -30,6 +30,7 @@ export default class {{ name|title|replace({'-':''}) }} extends HTMLElement {
 
 		// Подключаем кеширование:
 		this.dom = Template.mapDom( this.root );
+		this.cashe = this.casheValue();
     }
     
     /**
@@ -49,6 +50,15 @@ export default class {{ name|title|replace({'-':''}) }} extends HTMLElement {
 		const fragment = document.createDocumentFragment();
 		fragment.appendChild( template.content );
 		this.root.appendChild( fragment );
+	}
+	
+	/**
+	 * Кеширование значений или объектов.
+	 */
+	casheValue() {
+		return {
+			valueFirstTel: 'Значение или объект',
+		}
 	}
     
     /**
