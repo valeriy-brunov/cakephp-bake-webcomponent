@@ -67,7 +67,7 @@ export default class FieldTelephone extends HTMLElement {
 		}
 		else return FieldTelephone.DEFAULT_TEMPLTEL;
 	}
-	
+
 	/**
 	 * Значение по умолчанию геттера "templTel".
 	 */
@@ -156,19 +156,8 @@ export default class FieldTelephone extends HTMLElement {
     connectedCallback() {
 		// СОБЫТИЯ:
 		this.dom.fieldTel.addEventListener('focus', (e) => this.eventFieldFocus());
-		
-		// Изменения в текстовом поле.
-		/*this.dom.fieldTel.addEventListener('input', (e) => {
-			this.dom.fieldTel.classList.remove('user-tel_show');
-			alert(this.dom.fieldTel.value);
-		});*/
-
-		// Нажата клавиша на клавиатуре.
-		/*this.dom.fieldTel.addEventListener('keydown', (e) => {
-			this.dom.fieldTel.classList.add('user-tel_show');
-			this.saveString = this.dom.fieldTel.value;
-			this.dom.fieldTel.value = '';
-		});*/
+		this.dom.fieldTel.addEventListener('input', (e) => this.eventInput());
+		this.dom.fieldTel.addEventListener('keydown', (e) => this.eventKeyDown());
 		this.dom.fieldTel.addEventListener('blur', (e) => this.eventFieldBlur());
     }
 
@@ -178,6 +167,7 @@ export default class FieldTelephone extends HTMLElement {
     eventFieldFocus() {
 		if ( this.clearFocusLost == 'true' || this.dom.fieldTel.value.length === 0 ) {
 			this.dom.fieldTel.value = this.cashe.valueFirstTel;
+			this.dinamicTemplTel = this.cashe.valueFirstTel;
 		}
 	}
 
@@ -196,12 +186,38 @@ export default class FieldTelephone extends HTMLElement {
 	}
 
 	/**
-	 * Нажата клавиша на клавиатуре.
+	 * Нажата клавиша на клавиатуре (идёт первым событием).
 	 */
 	eventKeyDown() {
 		this.dom.fieldTel.classList.add('user-tel_show');
-		let len = this.dom.fieldTel.value.length;
-		
+		this.numbersArr = this.dom.fieldTel.value.match(/[0-9]/g);
+		this.dom.fieldTel.value = '';
+	}
+
+	/**
+	 * Изменения в текстовом поле (идёт вторым событием). Этот метод используется
+	 * для чтения символов с клавиатуры.
+	 */
+	eventInput() {
+		let simbol = this.dom.fieldTel.value;
+		this.dom.fieldTel.value = '';
+		let arr = this.numbersArr;
+		arr[this.numbersArr.length] = simbol;
+		this.insertIntoTemplate( arr );
+		this.dom.fieldTel.classList.remove('user-tel_show');
+	}
+	
+	/**
+	 * Вставляет строку цифр в шаблон.
+	 */
+	insertIntoTemplate( numbers ) {
+		let tmpl = this.templTel;
+		numbers.forEach( function(item, index, array) {
+			if ( index > 0 ) {
+				tmpl = tmpl.replace('_', item);
+			}
+		});
+this.dom.fieldTel.value = tmpl;
 	}
 }
 
