@@ -29,11 +29,9 @@ export default {
    */
   getCursorPosition( input ) {
 	  if ( input.selectionStart ) {
-	    // Стандартные браузеры MazillaFireFox, Opera, Chrom.
-      return input.selectionStart;
+      return input.selectionStart;// Стандартные браузеры MazillaFireFox, Opera, Chrom.
 	  }
-	  else if ( document.selection ) {
-      // IE.
+	  else if ( document.selection ) {// IE.
       input.focus();
       var sel = document.selection.createRange();
       var selLen = document.selection.createRange().text.length;
