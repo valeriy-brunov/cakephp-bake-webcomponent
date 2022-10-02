@@ -5,9 +5,9 @@
  */
 export default {
 
-	/**
-	 * Устанавливает курсор в нужную позицию внутри формы.
-	 */
+  /**
+   * Устанавливает курсор в нужную позицию внутри формы.
+   */
   setCursorPosition( oInput, oStart, oEnd ) {
     if ( oInput.setSelectionRange ) {
       oInput.setSelectionRange( oStart, oEnd );
