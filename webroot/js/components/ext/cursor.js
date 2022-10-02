@@ -5,11 +5,11 @@
  */
 export default {
 
-  /**
-   * Устанавливает курсор в нужную позицию внутри формы.
-   */
+	/**
+	 * Устанавливает курсор в нужную позицию внутри формы.
+	 */
   setCursorPosition( oInput, oStart, oEnd ) {
-	  if ( oInput.setSelectionRange ) {
+    if ( oInput.setSelectionRange ) {
       oInput.setSelectionRange( oStart, oEnd );
     }
     else if ( oInput.createTextRange ) {
@@ -28,10 +28,10 @@ export default {
    *     Объект элемента поля ввода номера телефона.
    */
   getCursorPosition( input ) {
-	  if ( input.selectionStart ) {
-      return input.selectionStart;// Стандартные браузеры MazillaFireFox, Opera, Chrom.
-	  }
-	  else if ( document.selection ) {// IE.
+    if ( input.selectionStart ) {
+      return input.selectionStart; // Стандартные браузеры MazillaFireFox, Opera, Chrom.
+    }
+    else if ( document.selection ) { // IE.
       input.focus();
       var sel = document.selection.createRange();
       var selLen = document.selection.createRange().text.length;
