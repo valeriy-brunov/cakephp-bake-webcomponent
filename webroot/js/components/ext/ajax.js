@@ -37,57 +37,58 @@ export default {
 	}
     },
 
-/**
- * XMLHttpRequest-запрос.
- * 
- * @param {object} param
- *     Параметры запроса:
- *         url: адрес запроса;
- * 	   method: метод запроса GET или POST;
- * 	   async: асинхронно или синхронно;
- * 	   data: данные передоваемые в запросе (строка или объект).
- *     Параметры, прикреплённые к событиям:
- * 	   success: ответ от сервера успешно получен вместе с кодом html;
- * 	   beforeSend: функция срабатывает перед AJAX-запросом;
- * 	   complete: срабатывает по окончанию запроса;
- * 	   progress: отслеживает загрузку;
- * 	   errorConnect: срабатывает, если произошла ошибка соединения;
- * 	   error: сработывает, если произошла ошибка запроса.
- */
-	connect( params ) {
-		if ( "url" in params ) {
-			let p = this.DEFAULT_PARAMS;
-			Object.assign( p, params );
+    /**
+     * XMLHttpRequest-запрос.
+     * 
+     * @param {object} param
+     *     Параметры запроса:
+     *         url: адрес запроса;
+     * 	   method: метод запроса GET или POST;
+     * 	   async: асинхронно или синхронно;
+     * 	   data: данные передоваемые в запросе (строка или объект).
+     *     Параметры, прикреплённые к событиям:
+     * 	   success: ответ от сервера успешно получен вместе с кодом html;
+     * 	   beforeSend: функция срабатывает перед AJAX-запросом;
+     * 	   complete: срабатывает по окончанию запроса;
+     * 	   progress: отслеживает загрузку;
+     * 	   errorConnect: срабатывает, если произошла ошибка соединения;
+     * 	   error: сработывает, если произошла ошибка запроса.
+     */
+    connect( params ) {
+	if ( "url" in params ) {
+	    let p = this.DEFAULT_PARAMS;
+	    Object.assign( p, params );
 
-			p.beforeSend();
+	    p.beforeSend();
 
-			const request = new XMLHttpRequest();
-			request.open( p.method, p.url, p.async );
-			request.addEventListener( 'load', (e) => {
-				p.success( e.target.response );
-			});
-			if ( "data" in p ) {
-				request.send( p.data );
-			}
-			else {
-				request.send();
-			}
+	    const request = new XMLHttpRequest();
+	    request.open( p.method, p.url, p.async );
+	    request.addEventListener( 'load', (e) => {
+		p.success( e.target.response );
+	    });
+	    if ( "data" in p ) {
+		request.send( p.data );
+	    }
+	    else {
+		request.send();
+	    }
 
-			request.onload = () => {
-				if (request.status != 200) {
-					p.error( request.status, request.statusText );
-				}
-				else {
-					p.complete( request );
-				}
-			};
-
-			request.onprogress = ( event ) => p.progress( event );
-
-			request.onerror = () => p.errorConnect();
+	    request.onload = () => {
+		if (request.status != 200) {
+		    p.error( request.status, request.statusText );
 		}
 		else {
-			console.log('Не указан адрес запроса url!');
+		    p.complete( request );
 		}
-	},
+	    };
+
+	    request.onprogress = ( event ) => p.progress( event );
+
+	    request.onerror = () => p.errorConnect();
+	}
+	else {
+	    console.log('Не указан адрес запроса url!');
+	}
+    },
 }
+
