@@ -12,7 +12,7 @@ export default {
 	 */
 	mapDom( scope ) {
 		return {
-			fieldTel: scope.querySelector('.user-tel'),
+		    fieldTel: scope.querySelector('.user-tel'),
 		}
 	},
 

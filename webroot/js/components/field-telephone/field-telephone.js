@@ -28,6 +28,10 @@ export default class FieldTelephone extends HTMLElement {
 		// Подключаем кеширование:
 		this.dom = Template.mapDom( this.root );
 		this.cashe = this.casheValue();
+		
+		// Значения по умолчанию:
+		// Зашита от "залипания" клавиш.
+		this.stick = false;
     }
     
     /**
@@ -54,7 +58,21 @@ export default class FieldTelephone extends HTMLElement {
 	 */
 	casheValue() {
 		return {
-			valueFirstTel: this.templTel.substr( 0, this.templTel.indexOf('_') ),
+			valueFirstTel: this.disInp(),
+			posValueFirstTel: this.templTel.indexOf('_'),
+			countNumberTemplTel: this.templTel.match(/[0-9]/g).length,
+		}
+	}
+
+	/**
+	 * Возвращает шаблон для вставки в текстовое поле при фокусе.
+	 */
+	disInp() {
+		if ( this.displayInput == 'full' ) {
+			return this.templTel;
+		}
+		if ( this.displayInput == 'left-to-right' ) {
+			return this.templTel.substr( 0, this.templTel.indexOf('_') );
 		}
 	}
 
@@ -101,14 +119,14 @@ export default class FieldTelephone extends HTMLElement {
 		}
 		else return FieldTelephone.DEFAULT_DISPLAYINPUT;
 	}
-	
+
 	/**
 	 * Значение по умолчанию геттера "displayInput".
 	 */
 	static get DEFAULT_DISPLAYINPUT() {
-		return 'left-to-right';
+		return 'full';
 	}
-	
+
 	/**
 	 * Очищать ли текстовое поле при потери фокуса, если там даже набран
 	 * номер телефона.
@@ -124,7 +142,7 @@ export default class FieldTelephone extends HTMLElement {
 	 * Значение по умолчанию для геттера "clearFocusLost".
 	 */
 	static get DEFAULT_CLEARFOCUSLOST() {
-		return 'true';
+		return 'false';
 	}
 
     /**
@@ -156,9 +174,18 @@ export default class FieldTelephone extends HTMLElement {
     connectedCallback() {
 		// СОБЫТИЯ:
 		this.dom.fieldTel.addEventListener('focus', (e) => this.eventFieldFocus());
-		this.dom.fieldTel.addEventListener('input', (e) => this.eventInput());
-		this.dom.fieldTel.addEventListener('keydown', (e) => this.eventKeyDown());
 		this.dom.fieldTel.addEventListener('blur', (e) => this.eventFieldBlur());
+		this.dom.fieldTel.addEventListener('keydown', (e) => {
+			if ( e.code == 'Backspace' ) {
+				this.eventKeyDownDelete();
+			}
+			else {
+				if ( /[0-9]/.test(e.key) ) {
+					this.eventKeyDown(e);
+				}
+			}
+		});
+		this.dom.fieldTel.addEventListener('keyup', (e) => this.eventKeyUp(e));
     }
 
     /**
@@ -167,7 +194,7 @@ export default class FieldTelephone extends HTMLElement {
     eventFieldFocus() {
 		if ( this.clearFocusLost == 'true' || this.dom.fieldTel.value.length === 0 ) {
 			this.dom.fieldTel.value = this.cashe.valueFirstTel;
-			this.dinamicTemplTel = this.cashe.valueFirstTel;
+			this.setCursorPosition( this.dom.fieldTel, this.cashe.posValueFirstTel, this.cashe.posValueFirstTel );
 		}
 	}
 
@@ -179,36 +206,41 @@ export default class FieldTelephone extends HTMLElement {
 			this.dom.fieldTel.value = '';
 		}
 		if ( this.clearFocusLost == 'false' ) {
-			if ( this.dom.fieldTel.value.length == this.cashe.valueFirstTel.length ) {
+			if ( this.cashe.countNumberTemplTel == this.dom.fieldTel.value.match(/[0-9]/g).length ) {
 				this.dom.fieldTel.value = '';
 			}
 		}
 	}
 
 	/**
-	 * Нажата клавиша на клавиатуре (идёт первым событием).
+	 * Нажата клавиша на клавиатуре.
+	 * 
+	 * @param {object} e
+	 * 		Event событие.
 	 */
-	eventKeyDown() {
-		this.dom.fieldTel.classList.add('user-tel_show');
+	eventKeyDown( e ) {
+		if ( this.stick ) return;
 		this.numbersArr = this.dom.fieldTel.value.match(/[0-9]/g);
-		this.dom.fieldTel.value = '';
+		this.numbersArr[this.numbersArr.length] = e.key;
+		this.dom.fieldTel.classList.add('user-tel_show');
+		this.stick = true;
 	}
 
 	/**
-	 * Изменения в текстовом поле (идёт вторым событием). Этот метод используется
-	 * для чтения символов с клавиатуры.
+	 * Отпущена клавиша на клавиатуре.
 	 */
-	eventInput() {
-		let simbol = this.dom.fieldTel.value;
-		this.dom.fieldTel.value = '';
-		let arr = this.numbersArr;
-		arr[this.numbersArr.length] = simbol;
-		this.insertIntoTemplate( arr );
+	eventKeyUp() {
 		this.dom.fieldTel.classList.remove('user-tel_show');
+		this.insertIntoTemplate( this.numbersArr );
+		this.stick = false;
 	}
-	
+
 	/**
-	 * Вставляет строку цифр в шаблон.
+	 * Вставляет строку цифр в шаблон и выводит её в текстовое поле, а также
+	 * устанавливает в нужную позицию курсор.
+	 * 
+	 * @param {array} numbers
+	 * 		Строка цифр номера телефона в виде массива.
 	 */
 	insertIntoTemplate( numbers ) {
 		let tmpl = this.templTel;
@@ -217,8 +249,45 @@ export default class FieldTelephone extends HTMLElement {
 				tmpl = tmpl.replace('_', item);
 			}
 		});
-this.dom.fieldTel.value = tmpl;
+		let pos = tmpl.indexOf('_');
+		this.dom.fieldTel.value = tmpl;
+		this.setCursorPosition( this.dom.fieldTel, pos, pos );
 	}
+	
+	/**
+	 * Нажата клавиша "Delete" на клавиатуре.
+	 */
+	eventKeyDownDelete() {
+		if ( this.stick ) return;
+		this.dom.fieldTel.classList.add('user-tel_show');
+		this.numbersArr = this.dom.fieldTel.value.match(/[0-9]/g).slice(0,-1);
+		this.stick = true;
+	}
+	
+	/**
+     * Метод устанавливает курсор в нужную позицию внутри формы.
+     *
+     * @param {object) oInput
+     * 		Объект элемента поля ввода номера телефона.
+     * @param {int} oStart
+     * 		Позиция начала выделения текста в поле формы.
+     * @param {int} oEnd
+     * 		Позиция конца выделения текста в поле формы.
+     *
+     * При совпадении oStart и oEnd курсор устанавливается в указанную позицию.
+     */
+    setCursorPosition( oInput, oStart, oEnd ) {
+        if ( oInput.setSelectionRange ) {
+            oInput.setSelectionRange( oStart, oEnd );
+        }
+        else if ( oInput.createTextRange ) {
+            range = oInput.createTextRange();
+            range.collapse( true );
+            range.moveEnd( 'character', oEnd );
+            range.moveStart( 'character', oStart );
+            range.select();
+        }
+    }
 }
 
 /**
